@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Aplikasi Daftar Nilai - Pesantren Al Ma'tuq">
+  <title>Daftar Nilai - Al Ma'tuq</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script id="embedded-data">
+    // ========================================================================
+    // PASTE KODE: window.EMBEDDED_SISWA = { ... } DARI APLIKASI LAMA DI SINI
+    // PASTE KODE: window.EMBEDDED_NILAI = { ... } DARI APLIKASI LAMA DI SINI
+    // ========================================================================
+    window.EMBEDDED_SISWA = {}; // Ganti dengan data aslinya
+    window.EMBEDDED_NILAI = {}; // Ganti dengan data aslinya
+  </script>
+  
+  <style>
+    body { -webkit-user-select: none; user-select: none; }
+    input, select { -webkit-user-select: text; user-select: text; }
+    
+    input[type="number"]::-webkit-outer-spin-button, 
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    .table-scroll { max-height: 65vh; overflow-y: auto; overflow-x: auto; position: relative;}
+    .tabel-smt1 .col-smt2 { display: none; }
+    .tabel-smt2 .col-smt1 { display: none; }
+
+    /* Pengaturan Freeze Header Table */
+    #tabel-nilai { border-collapse: separate; border-spacing: 0; }
+    #tabel-nilai th, #tabel-nilai td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+    #tabel-nilai th { border-top: 1px solid #0f766e; }
+    #tabel-nilai td:first-child, #tabel-nilai th:first-child { border-left: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 pb-24 font-sans">
+
+  <input type="file" id="fileUpload" class="hidden" onchange="prosesImport(event)" accept=".xlsx, .xls">
+  <input type="file" id="fileRestore" class="hidden" onchange="restoreData(event)" accept=".json">
+
+  <!-- Header & Navigasi -->
+  <div class="bg-gradient-to-r from-blue-900 to-blue-600 text-white p-6 shadow-md relative">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-center md:text-left">
+        <h2 class="text-2xl font-extrabold tracking-wide">DAFTAR NILAI</h2>
+        <h3 class="text-sm font-medium text-blue-200 tracking-wider">PESANTREN AL MA'TUQ</h3>
+      </div>
+      
+      <div class="flex gap-2 flex-wrap justify-center">
+        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white text-blue-900 shadow" id="nav-utama" onclick="bukaHalaman('utama')">🏠 Utama</button>
+        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-siswa" onclick="bukaHalaman('siswa')">👥 Data Siswa</button>
+        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-pengaturan" onclick="bukaHalaman('pengaturan')">⚙️ Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-full mx-auto px-2 md:px-6 py-4">
+    <!-- HALAMAN UTAMA -->
+    <div id="page-input" class="block space-y-4">
+      
+      <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-blue-500">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Guru</label>
+            <input type="text" id="guru" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="Nama Guru" oninput="saveSesi()">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Mata Pelajaran</label>
+            <input type="text" id="mapel" list="list-mapel" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition uppercase" placeholder="Ketik/Pilih" onchange="gantiMapel(); simpanHistoryMapel(this.value);" oninput="saveSesi()">
+            <datalist id="list-mapel"></datalist>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Kelas</label>
+            <select id="kelas" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer" onchange="loadSiswa()"></select>
+          </div>
+          <div id="container-siswa" class="hidden bg-blue-50 p-3 rounded-lg border border-blue-200">
+            <label class="block text-xs font-bold text-blue-800 mb-1 uppercase tracking-wide">🔍 Fokus Siswa</label>
+            <select id="siswa" class="w-full p-2 border border-blue-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer" onchange="filterSiswa()"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabel Controls -->
+      <div id="tab-container" class="hidden flex-col md:flex-row justify-between items-end gap-3 pt-2 border-b-2 border-slate-300 pb-2 px-1">
+        <div class="flex gap-1 w-full md:w-auto">
+          <button id="btn-smt1" class="flex-1 md:flex-none px-5 py-2.5 bg-blue-700 text-white font-bold rounded-t-lg transition" onclick="pindahSemester('1')">SMT 1</button>
+          <button id="btn-smt2" class="flex-1 md:flex-none px-5 py-2.5 bg-slate-300 text-slate-600 font-bold rounded-t-lg transition hover:bg-slate-400" onclick="pindahSemester('2')">SMT 2</button>
+        </div>
+        <div class="flex flex-wrap gap-2 items-center w-full md:w-auto justify-end">
+          <select id="jenis-export" class="p-2 rounded-md border border-slate-400 text-xs font-bold text-slate-700 outline-none cursor-pointer bg-white">
+            <option value="smt1">FULL SMT 1</option>
+            <option value="sts1">HANYA STS 1</option>
+            <option value="rapor1">HANYA RAPOR SMT 1</option>
+            <option value="smt2">FULL SMT 2</option>
+            <option value="sts2">HANYA STS 2</option>
+            <option value="rapor2">HANYA RAPOR SMT 2</option>
+            <option value="full">FULL 2 SMT</option>
+            <option value="rapor_full">RAPOR SMT 1 & 2</option>
+          </select>
+          <button onclick="document.getElementById('fileUpload').click()" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-bold transition shadow-sm">📥 Impor</button>
+          <button onclick="exportDataBaru('kelas')" class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Kelas</button>
+          <button onclick="exportDataBaru('semua')" class="px-3 py-2 bg-blue-800 hover:bg-blue-900 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Semua</button>
+        </div>
+      </div>
+
+      <!-- Container Tabel -->
+      <div id="table-container" class="hidden bg-white rounded-xl shadow-lg border border-slate-200 table-scroll">
+        <table id="tabel-nilai" class="tabel-smt1 w-full min-w-[800px] text-xs">
+          <thead>
+            <!-- Baris Header 1 -->
+            <tr class="h-[40px] bg-teal-700 text-white uppercase tracking-wider text-center">
+              <th rowspan="2" class="sticky top-0 left-0 z-[40] bg-teal-700 w-[40px] p-2 border-r border-teal-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-teal-900">No</th>
+              <th rowspan="2" class="sticky top-0 left-[40px] z-[40] bg-teal-700 text-left p-2 min-w-[200px] w-[200px] border-r border-teal-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-teal-900">Nama Lengkap</th>
+              <th colspan="12" class="col-smt1 sticky top-0 z-[30] bg-teal-700 p-2 border-b border-teal-600">NILAI SEMESTER 1</th>
+              <th colspan="13" class="col-smt2 sticky top-0 z-[30] bg-teal-700 p-2 border-b border-teal-600">NILAI SEMESTER 2</th>
+            </tr>
+            <!-- Baris Header 2 -->
+            <tr class="h-[40px] bg-teal-600 text-white text-center border-b-2 border-teal-900">
+              <!-- SMT 1 Headers -->
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH1</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH2</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH3</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH4</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH5</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH6</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH7</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH8</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-800 p-2 w-16">STS 1</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-600 p-2 w-16">RATA2</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-teal-800 p-2 w-16">PAS</th>
+              <th class="col-smt1 sticky top-[40px] z-[30] bg-blue-700 p-2 w-16">RAPOR 1</th>
+              
+              <!-- SMT 2 Headers -->
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-800 text-teal-100 p-2 w-16 leading-tight">RAPOR 1<br>(Auto)</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH1</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH2</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH3</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH4</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH5</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH6</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH7</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-14">NH8</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-800 p-2 w-16">STS 2</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-600 p-2 w-16">RATA2</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-teal-800 p-2 w-16">SAS</th>
+              <th class="col-smt2 sticky top-[40px] z-[30] bg-blue-700 p-2 w-16">RAPOR 2</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="bg-white">
+            <!-- Data baris dirender JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HALAMAN MANAJEMEN SISWA -->
+    <div id="page-siswa" class="hidden">
+      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-amber-500">
+        <h3 class="text-lg font-bold text-amber-700 mb-2">👥 Pengaturan Data Siswa</h3>
+        <p class="text-sm text-slate-500 mb-6">Di dieu tiasa ngarobah ngaran, mindahkeun budak ka kelas séjén, ngahapus, sarta ngatur urutan absen (naik/turun).</p>
+        
+        <div class="mb-4 max-w-sm">
+          <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Pilih Kelas:</label>
+          <select id="kelas-manajemen" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50" onchange="renderTabelSiswa()"></select>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
+              <tr>
+                <th class="p-3 w-12 text-center">No</th>
+                <th class="p-3">Nama Siswa (Ketik u/ Edit)</th>
+                <th class="p-3 w-64 text-center">Aksi / Urutan</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-manajemen" class="divide-y divide-slate-200">
+              <tr><td colspan="3" class="p-5 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- HALAMAN PENGATURAN -->
+    <div id="page-data" class="hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Card Import -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-emerald-500">
+          <h3 class="text-lg font-bold text-emerald-700 mb-2">📂 Import Data Excel (Multi-Sheet)</h3>
+          <p class="text-sm text-slate-500 mb-4">Pilih file Excel. Sistem otomatis ngabaca sadaya *sheet* sareng nga-import sakaligus jadi sababaraha kelas.</p>
+          <button class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition" onclick="document.getElementById('fileUpload').click()">Mulai Import Excel</button>
+        </div>
+
+        <!-- Card Backup & Restore -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-blue-500">
+          <h3 class="text-lg font-bold text-blue-700 mb-2">🔄 Backup & Restore Data</h3>
+          <p class="text-sm text-slate-500 mb-4">Amankeun data lokal ka jero file JSON, atawa balikeun data tina file backup JSON sateuacanna.</p>
+          <div class="flex gap-2">
+            <button class="flex-1 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded-lg transition border border-blue-300" onclick="backupData()">☁️ Backup (Download)</button>
+            <button class="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg transition" onclick="document.getElementById('fileRestore').click()">🔁 Restore (Upload)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Card Reset -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-red-500">
+          <h3 class="text-lg font-bold text-red-600 mb-2">⚠️ Reset Memori HP Ini</h3>
+          <p class="text-sm text-slate-500 mb-4">Pencét ieu pami badé ngosongkeun sadaya aplikasi jiga anyar deui (Nomer Kelas & Nilai bakal leungit tina panyimpenan browser).</p>
+          <button class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition" onclick="resetSemuaData()">Hapus Semua Cache Browser</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /* PROTEKSI */
+    document.addEventListener('contextmenu', e => e.preventDefault()); 
+    document.onkeydown = function(e) { 
+      if(e.keyCode === 123) return false;
+      if(e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) return false;
+      if(e.ctrlKey && e.keyCode === 85) return false;
+    };
+
+    /* DATABASE */
+    let dbSiswa = JSON.parse(localStorage.getItem('almatuq_siswa')) || window.EMBEDDED_SISWA || {};
+    let dataNilai = JSON.parse(localStorage.getItem('almatuq_nilai')) || window.EMBEDDED_NILAI || {};
+    let siswaSaatIni = [];
+
+    function getKey(kelas, namaSiswa) {
+      let mapel = document.getElementById('mapel').value.trim().toUpperCase();
+      if(mapel === "") mapel = "UMUM"; 
+      return mapel + "_" + kelas + "_" + namaSiswa;
+    }
+
+    window.onload = function() {
+      document.getElementById('guru').value = localStorage.getItem('almatuq_guru') || '';
+      document.getElementById('mapel').value = localStorage.getItem('almatuq_mapel') || '';
+      loadHistoryMapel();
+      updateDropdownKelasGlobal();
+      
+      const kelasPanungtung = localStorage.getItem('almatuq_kelas');
+      if (kelasPanungtung && dbSiswa[kelasPanungtung]) {
+        document.getElementById('kelas').value = kelasPanungtung;
+        loadSiswa(); 
+      }
+    };
+
+    function saveSesi() {
+      localStorage.setItem('almatuq_guru', document.getElementById('guru').value);
+      localStorage.setItem('almatuq_mapel', document.getElementById('mapel').value);
+    }
+
+    function gantiMapel() {
+      saveSesi();
+      if(document.getElementById('kelas').value !== "") loadSiswa(); 
+    }
+
+    /* SISTEM NAVIGASI */
+    function bukaHalaman(hal) {
+      document.getElementById('page-input').classList.toggle('hidden', hal !== 'utama');
+      document.getElementById('page-siswa').classList.toggle('hidden', hal !== 'siswa');
+      document.getElementById('page-data').classList.toggle('hidden', hal !== 'pengaturan');
+
+      const activeClass = "bg-white text-blue-900 shadow".split(" ");
+      const inactiveClass = "bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm".split(" ");
+
+      ['utama', 'siswa', 'pengaturan'].forEach(menu => {
+        let btn = document.getElementById('nav-' + menu);
+        if (hal === menu) {
+          btn.classList.remove(...inactiveClass);
+          btn.classList.add(...activeClass);
+        } else {
+          btn.classList.remove(...activeClass);
+          btn.classList.add(...inactiveClass);
+        }
+      });
+
+      updateDropdownKelasGlobal();
+      if (hal === 'siswa') renderTabelSiswa();
+    }
+
+    function updateDropdownKelasGlobal() {
+      const selectUtama = document.getElementById('kelas');
+      const selectManajemen = document.getElementById('kelas-manajemen');
+      
+      let valUtama = selectUtama.value;
+      let valManajemen = selectManajemen.value;
+      
+      let options = '<option value="">-- Pilih Kelas --</option>';
+      Object.keys(dbSiswa).sort().forEach(k => { options += `<option value="${k}">${k}</option>`; });
+      
+      selectUtama.innerHTML = options;
+      selectManajemen.innerHTML = options;
+      
+      if(valUtama && dbSiswa[valUtama]) selectUtama.value = valUtama;
+      if(valManajemen && dbSiswa[valManajemen]) selectManajemen.value = valManajemen;
+    }
+
+    /* --- FUNGSI MANAJEMEN SISWA KHUSUS --- */
+    function renderTabelSiswa() {
+      const kls = document.getElementById('kelas-manajemen').value;
+      const tbody = document.getElementById('tbody-manajemen');
+      if(!kls || !dbSiswa[kls]) { tbody.innerHTML = '<tr><td colspan="3" class="p-5 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>'; return; }
+
+      let html = '';
+      dbSiswa[kls].forEach((s, i) => {
+        html += `
+        <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 text-center font-bold text-slate-400">${i+1}</td>
+            <td class="p-2">
+              <input type="text" class="w-full p-2 border-b border-slate-300 bg-transparent font-semibold text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-blue-50 transition" value="${s.nama}" onchange="updateNamaMaster('${kls}', ${i}, this.value, '${s.nama}')">
+            </td>
+            <td class="p-2 text-center space-x-1">
+                <button class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold transition shadow-sm" title="Naik" onclick="geserSiswa('${kls}', ${i}, -1)">⬆️</button>
+                <button class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-bold transition shadow-sm" title="Turun" onclick="geserSiswa('${kls}', ${i}, 1)">⬇️</button>
+                <button class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold transition shadow-sm" title="Pindah Kelas" onclick="pindahKelas('${kls}', ${i})">➡️ Pindah</button>
+                <button class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-bold transition shadow-sm" title="Hapus" onclick="hapusSiswa('${kls}', ${i})">🗑️</button>
+            </td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function geserSiswa(kelas, index, arah) {
+      let arr = dbSiswa[kelas];
+      if(index + arah < 0 || index + arah >= arr.length) return;
+      let temp = arr[index];
+      arr[index] = arr[index + arah];
+      arr[index + arah] = temp;
+      simpanDataSiswaGlobal();
+    }
+
+    function updateNamaMaster(kelas, index, namaBaru, namaLama) {
+      namaBaru = namaBaru.trim().toUpperCase();
+      if(namaBaru === "" || namaBaru === namaLama) { renderTabelSiswa(); return; }
+      if(dbSiswa[kelas].find(s => s.nama === namaBaru)) {
+          alert("Ngaran ieu geus aya di kelas!"); renderTabelSiswa(); return;
+      }
+
+      dbSiswa[kelas][index].nama = namaBaru;
+
+      let suffixLama = `_${kelas}_${namaLama}`;
+      let suffixBaru = `_${kelas}_${namaBaru}`;
+      let newDataNilai = {};
+      
+      for(let k in dataNilai) {
+          if(k.endsWith(suffixLama)) {
+              let newK = k.replace(suffixLama, suffixBaru);
+              newDataNilai[newK] = dataNilai[k];
+          } else { newDataNilai[k] = dataNilai[k]; }
+      }
+      dataNilai = newDataNilai;
+      simpanDataSiswaGlobal();
+    }
+
+    function pindahKelas(kelasAsal, index) {
+      let namaSiswa = dbSiswa[kelasAsal][index].nama;
+      let kelasTujuan = prompt(`Pindahkeun "${namaSiswa}" ka kelas mana?\n(Ketik ngaran kelas tujuan, misal: 8A)`, "").trim().toUpperCase();
+      
+      if(!kelasTujuan || kelasTujuan === kelasAsal) return;
+
+      if(!dbSiswa[kelasTujuan]) dbSiswa[kelasTujuan] = [];
+      if(dbSiswa[kelasTujuan].find(s => s.nama === namaSiswa)) { alert("Ngaran ieu geus aya di kelas tujuan!"); return; }
+
+      dbSiswa[kelasTujuan].push({nama: namaSiswa});
+      dbSiswa[kelasAsal].splice(index, 1);
+
+      let suffixLama = `_${kelasAsal}_${namaSiswa}`;
+      let suffixBaru = `_${kelasTujuan}_${namaSiswa}`;
+      let newDataNilai = {};
+      
+      for(let k in dataNilai) {
+          if(k.endsWith(suffixLama)) {
+              let newK = k.replace(suffixLama, suffixBaru);
+              newDataNilai[newK] = dataNilai[k];
+          } else { newDataNilai[k] = dataNilai[k]; }
+      }
+      dataNilai = newDataNilai;
+      
+      alert(`Bérés! Data ${namaSiswa} pindah ka kelas ${kelasTujuan}.`);
+      updateDropdownKelasGlobal();
+      document.getElementById('kelas-manajemen').value = kelasTujuan; 
+      simpanDataSiswaGlobal();
+    }
+
+    function hapusSiswa(kelas, index) {
+      let namaSiswa = dbSiswa[kelas][index].nama;
+      if(!confirm(`Yakin badé ngahapus ${namaSiswa}? Data nilaina ogé bakal leungit permanén!`)) return;
+
+      dbSiswa[kelas].splice(index, 1);
+      
+      let suffix = `_${kelas}_${namaSiswa}`;
+      let newDataNilai = {};
+      for(let k in dataNilai) {
+          if(!k.endsWith(suffix)) newDataNilai[k] = dataNilai[k];
+      }
+      dataNilai = newDataNilai;
+      simpanDataSiswaGlobal();
+    }
+
+    function simpanDataSiswaGlobal() {
+      localStorage.setItem('almatuq_siswa', JSON.stringify(dbSiswa));
+      localStorage.setItem('almatuq_nilai', JSON.stringify(dataNilai));
+      renderTabelSiswa();
+      
+      if(document.getElementById('kelas').value === document.getElementById('kelas-manajemen').value) {
+          loadSiswa();
+      }
+    }
+
+
+    /* --- FUNGSI IMPORT EXCEL --- */
+    function prosesImport(event) {
+      if (typeof XLSX === 'undefined') return alert("Pustaka Excel can ka-load. Pastikeun aya internet!");
+      
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          let countSiswa = 0;
+          let loadedSheets = 0;
+
+          workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, {defval: ""});
+            
+            let dataFoundInSheet = false;
+            jsonData.forEach(row => {
+              let rawKelas = row['Kelas'] || row['kelas'] || row['KELAS'] || row['Rombel'] || '';
+              let rawNama = row['Nama Siswa'] || row['Nama Lengkap'] || row['Nama'] || row['NAMA'] || '';
+              let k = String(rawKelas).trim().toUpperCase();
+              let nama = String(rawNama).trim().toUpperCase();
+              
+              if (!k && nama !== "") k = String(sheetName).split("-")[0].trim().toUpperCase();
+              
+              if (k !== "" && nama !== "") {
+                dataFoundInSheet = true;
+                countSiswa++;
+                if (!dbSiswa[k]) dbSiswa[k] = [];
+                let isExist = dbSiswa[k].find(s => s.nama === nama);
+                
+                if (!isExist) { dbSiswa[k].push({ nama: nama }); }
+
+                let keyUnik = getKey(k, nama);
+                if (!dataNilai[keyUnik]) {
+                  dataNilai[keyUnik] = { 
+                    s1_nh1:'', s1_nh2:'', s1_nh3:'', s1_nh4:'', s1_nh5:'', s1_nh6:'', s1_nh7:'', s1_nh8:'', s1_sts:'', s1_pas:'', s1_rata2:'0.00',
+                    rap1:'', nh1:'', nh2:'', nh3:'', nh4:'', nh5:'', nh6:'', nh7:'', nh8:'', sts:'', rata2:'0.00', sas:'', rap2:'0' 
+                  };
+                }
+                
+                let dn = dataNilai[keyUnik];
+
+                if ('STS 1' in row) dn.s1_sts = row['STS 1'];
+                if ('PAS' in row) dn.s1_pas = row['PAS'];
+                for(let j=1; j<=8; j++) if (`NH ${j} SMT1` in row) dn[`s1_nh${j}`] = row[`NH ${j} SMT1`];
+
+                if ('STS 2' in row) dn.sts = row['STS 2'];
+                else if ('STS' in row) dn.sts = row['STS']; 
+                else if ('STS2 / SIMULASI' in row) dn.sts = row['STS2 / SIMULASI']; 
+                
+                if ('SAS' in row) dn.sas = row['SAS'];
+                else if ('SAS / ATPM' in row) dn.sas = row['SAS / ATPM'];
+
+                for(let j=1; j<=8; j++) {
+                  if (`NH ${j} SMT2` in row) dn[`nh${j}`] = row[`NH ${j} SMT2`];
+                  else if (`NH ${j}` in row && !(`NH ${j} SMT1` in row)) dn[`nh${j}`] = row[`NH ${j}`]; 
+                }
+
+                // Kalkulasi otomatis
+                let sumS1 = 0, countS1 = 0;
+                for(let i=1; i<=8; i++) {
+                  let val = dn[`s1_nh${i}`];
+                  if(val !== "" && val !== undefined && !isNaN(val)) { sumS1 += parseFloat(val); countS1++; }
+                }
+                if(dn.s1_sts !== "" && dn.s1_sts !== undefined && !isNaN(dn.s1_sts)) { sumS1 += parseFloat(dn.s1_sts); countS1++; }
+                dn.s1_rata2 = countS1 === 0 ? "0.00" : (sumS1 / countS1).toFixed(2);
+                
+                let s1_pas = parseFloat(dn.s1_pas);
+                dn.rap1 = !isNaN(s1_pas) ? Math.round((parseFloat(dn.s1_rata2) * 0.4) + (s1_pas * 0.6)) : "";
+
+                let sumS2 = 0, countS2 = 0;
+                for(let i=1; i<=8; i++) {
+                  let val = dn[`nh${i}`];
+                  if(val !== "" && val !== undefined && !isNaN(val)) { sumS2 += parseFloat(val); countS2++; }
+                }
+                if(dn.sts !== "" && dn.sts !== undefined && !isNaN(dn.sts)) { sumS2 += parseFloat(dn.sts); countS2++; }
+                dn.rata2 = countS2 === 0 ? "0.00" : (sumS2 / countS2).toFixed(2);
+                
+                let rap1_num = parseFloat(dn.rap1) || 0;
+                let sas = parseFloat(dn.sas) || 0;
+                dn.rap2 = (countS2 === 0 && rap1_num === 0 && sas === 0) ? "" : Math.round((0.5 * rap1_num) + 0.5 * ((0.4 * parseFloat(dn.rata2)) + (0.6 * sas)));
+              }
+            });
+            if(dataFoundInSheet) loadedSheets++;
+          });
+
+          if (countSiswa === 0) {
+            alert("Gagal maca data! Pastikeun file Excel-na bener aya kolom 'Kelas' jeung 'Nama Siswa'.");
+          } else {
+            localStorage.setItem('almatuq_siswa', JSON.stringify(dbSiswa));
+            localStorage.setItem('almatuq_nilai', JSON.stringify(dataNilai));
+            
+            updateDropdownKelasGlobal();
+            
+            document.getElementById('kelas').value = "";
+            document.getElementById('container-siswa').classList.add('hidden');
+            document.getElementById('table-container').classList.add('hidden');
+            document.getElementById('tab-container').classList.replace('flex', 'hidden');
+            
+            alert(`🎉 Mantap!\nBerhasil nge-import ${countSiswa} data siswa dari ${loadedSheets} sheet (kelas).\nMangga buka Halaman Utama lajeng pilih Kelasna.`);
+          }
+        } catch (err) {
+          alert("Duh aya error: " + err.message);
+        }
+        
+        event.target.value = ""; 
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
+
+    /* SISTEM TABEL UTAMA & NGITUNG NILAI */
+    const getWarnaBeureum = (val) => { return (val !== "" && !isNaN(val) && parseFloat(val) < 65) ? "text-red-500 font-bold" : "text-slate-700"; };
+
+    function loadSiswa() {
+      const kelas = document.getElementById('kelas').value;
+      const selectSiswa = document.getElementById('siswa');
+      
+      if (!kelas) { 
+        document.getElementById('container-siswa').classList.add('hidden'); 
+        document.getElementById('table-container').classList.add('hidden'); 
+        document.getElementById('tab-container').classList.replace('flex', 'hidden'); 
+        localStorage.setItem('almatuq_kelas', ''); return; 
+      }
+
+      localStorage.setItem('almatuq_kelas', kelas);
+      siswaSaatIni = dbSiswa[kelas] || [];
+      selectSiswa.innerHTML = '<option value="all">Tampilkan Semua Siswa</option>';
+      
+      siswaSaatIni.forEach((s, i) => {
+        selectSiswa.innerHTML += `<option value="${i}">${s.nama}</option>`;
+        let keyUnik = getKey(kelas, s.nama); 
+        if(!dataNilai[keyUnik]) {
+          dataNilai[keyUnik] = { 
+            s1_nh1:'', s1_nh2:'', s1_nh3:'', s1_nh4:'', s1_nh5:'', s1_nh6:'', s1_nh7:'', s1_nh8:'', s1_sts:'', s1_pas:'', s1_rata2:'0.00',
+            rap1:'', nh1:'', nh2:'', nh3:'', nh4:'', nh5:'', nh6:'', nh7:'', nh8:'', sts:'', rata2:'0.00', sas:'', rap2:'0' 
+          };
+        }
+      });
+      
+      document.getElementById('container-siswa').classList.remove('hidden'); 
+      document.getElementById('table-container').classList.remove('hidden');
+      document.getElementById('tab-container').classList.replace('hidden', 'flex'); 
+      renderTable('all');
+    }
+
+    function filterSiswa() { renderTable(document.getElementById('siswa').value); }
+
+    function renderTable(filterIndex) {
+      const tbody = document.getElementById('table-body');
+      const kelas = document.getElementById('kelas').value;
+      let html = '';
+
+      const inputClass = "w-full text-center bg-transparent py-2 px-1 focus:bg-blue-50 focus:outline-none transition-colors border-none";
+      const readonlyClass = "w-full text-center bg-transparent py-2 px-1 font-bold border-none outline-none";
+
+      siswaSaatIni.forEach((s, i) => {
+        if(filterIndex !== 'all' && parseInt(filterIndex) !== i) return;
+        
+        let keyUnik = getKey(kelas, s.nama);
+        const dn = dataNilai[keyUnik];
+        
+        html += `<tr class="hover:bg-blue-50 transition group">
+          <td class="sticky left-0 z-[10] bg-white group-hover:bg-blue-50 transition text-center font-bold text-slate-400 p-1 w-[40px] border-r border-slate-200 shadow-[1px_0_2px_rgba(0,0,0,0.02)]">${i+1}</td>
+          <td class="col-nama sticky left-[40px] z-[10] bg-white group-hover:bg-blue-50 transition font-semibold text-slate-700 p-2 border-r border-slate-200 shadow-[2px_0_4px_rgba(0,0,0,0.05)] text-xs whitespace-nowrap">${s.nama}</td>
+          
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh1)}" value="${dn.s1_nh1}" oninput="simpanData('${keyUnik}', 's1_nh1', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh2)}" value="${dn.s1_nh2}" oninput="simpanData('${keyUnik}', 's1_nh2', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh3)}" value="${dn.s1_nh3}" oninput="simpanData('${keyUnik}', 's1_nh3', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh4)}" value="${dn.s1_nh4}" oninput="simpanData('${keyUnik}', 's1_nh4', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh5)}" value="${dn.s1_nh5}" oninput="simpanData('${keyUnik}', 's1_nh5', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh6)}" value="${dn.s1_nh6}" oninput="simpanData('${keyUnik}', 's1_nh6', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh7)}" value="${dn.s1_nh7}" oninput="simpanData('${keyUnik}', 's1_nh7', this.value, this)"></td>
+          <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh8)}" value="${dn.s1_nh8}" oninput="simpanData('${keyUnik}', 's1_nh8', this.value, this)"></td>
+          <td class="col-smt1 p-0 bg-slate-100"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_sts)}" value="${dn.s1_sts}" oninput="simpanData('${keyUnik}', 's1_sts', this.value, this)"></td>
+          <td class="col-smt1 p-0 bg-slate-50"><input type="text" id="s1_rata2_${i}" class="${readonlyClass} ${getWarnaBeureum(dn.s1_rata2)}" value="${dn.s1_rata2}" readonly></td>
+          <td class="col-smt1 p-0 bg-slate-100"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_pas)}" value="${dn.s1_pas}" oninput="simpanData('${keyUnik}', 's1_pas', this.value, this)"></td>
+          <td class="col-smt1 p-0 bg-blue-100/50"><input type="text" id="s1_rap_${i}" class="${readonlyClass} ${getWarnaBeureum(dn.rap1)}" value="${dn.rap1}" readonly></td>
+
+          <td class="col-smt2 p-0 bg-teal-50"><input type="text" id="rap1_tampil_${i}" class="${readonlyClass} ${getWarnaBeureum(dn.rap1)}" value="${dn.rap1}" readonly></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh1)}" value="${dn.nh1}" oninput="simpanData('${keyUnik}', 'nh1', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh2)}" value="${dn.nh2}" oninput="simpanData('${keyUnik}', 'nh2', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh3)}" value="${dn.nh3}" oninput="simpanData('${keyUnik}', 'nh3', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh4)}" value="${dn.nh4}" oninput="simpanData('${keyUnik}', 'nh4', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh5)}" value="${dn.nh5}" oninput="simpanData('${keyUnik}', 'nh5', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh6)}" value="${dn.nh6}" oninput="simpanData('${keyUnik}', 'nh6', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh7)}" value="${dn.nh7}" oninput="simpanData('${keyUnik}', 'nh7', this.value, this)"></td>
+          <td class="col-smt2 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.nh8)}" value="${dn.nh8}" oninput="simpanData('${keyUnik}', 'nh8', this.value, this)"></td>
+          <td class="col-smt2 p-0 bg-slate-100"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.sts)}" value="${dn.sts}" oninput="simpanData('${keyUnik}', 'sts', this.value, this)"></td>
+          <td class="col-smt2 p-0 bg-slate-50"><input type="text" id="rata2_${i}" class="${readonlyClass} ${getWarnaBeureum(dn.rata2)}" value="${dn.rata2}" readonly></td>
+          <td class="col-smt2 p-0 bg-slate-100"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.sas)}" value="${dn.sas}" oninput="simpanData('${keyUnik}', 'sas', this.value, this)"></td>
+          <td class="col-smt2 p-0 bg-blue-100/50"><input type="text" id="rap2_${i}" class="${readonlyClass} ${getWarnaBeureum(dn.rap2)}" value="${dn.rap2}" readonly></td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function simpanData(keyUnik, field, value, element) {
+      dataNilai[keyUnik][field] = value;
+      if(element) {
+        if(value !== "" && !isNaN(value) && parseFloat(value) < 65) {
+          element.classList.add("text-red-500", "font-bold");
+          element.classList.remove("text-slate-700");
+        } else {
+          element.classList.remove("text-red-500", "font-bold");
+          element.classList.add("text-slate-700");
+        }
+      }
+      hitung(keyUnik);
+      localStorage.setItem('almatuq_nilai', JSON.stringify(dataNilai));
+    }
+
+    function hitung(keyUnik) {
+      const dn = dataNilai[keyUnik];
+      
+      let sumS1 = 0, countS1 = 0;
+      for(let i=1; i<=8; i++) {
+        let val = dn[`s1_nh${i}`];
+        if(val !== "" && val !== undefined && !isNaN(val)) { sumS1 += parseFloat(val); countS1++; }
+      }
+      if(dn.s1_sts !== "" && dn.s1_sts !== undefined && !isNaN(dn.s1_sts)) { sumS1 += parseFloat(dn.s1_sts); countS1++; }
+      dn.s1_rata2 = countS1 === 0 ? "0.00" : (sumS1 / countS1).toFixed(2);
+      
+      let s1_pas = parseFloat(dn.s1_pas);
+      dn.rap1 = !isNaN(s1_pas) ? Math.round((parseFloat(dn.s1_rata2) * 0.4) + (s1_pas * 0.6)) : "";
+
+      let sumS2 = 0, countS2 = 0;
+      for(let i=1; i<=8; i++) {
+        let val = dn[`nh${i}`];
+        if(val !== "" && val !== undefined && !isNaN(val)) { sumS2 += parseFloat(val); countS2++; }
+      }
+      if(dn.sts !== "" && dn.sts !== undefined && !isNaN(dn.sts)) { sumS2 += parseFloat(dn.sts); countS2++; }
+      dn.rata2 = countS2 === 0 ? "0.00" : (sumS2 / countS2).toFixed(2);
+      
+      let rap1_num = parseFloat(dn.rap1) || 0;
+      let sas = parseFloat(dn.sas) || 0;
+      dn.rap2 = countS2 === 0 && rap1_num === 0 && sas === 0 ? "" : Math.round((0.5 * rap1_num) + 0.5 * ((0.4 * parseFloat(dn.rata2)) + (0.6 * sas)));
+      
+      const kelas = document.getElementById('kelas').value;
+      siswaSaatIni.forEach((s, i) => {
+        if(getKey(kelas, s.nama) === keyUnik) {
+          let elS1Rata = document.getElementById(`s1_rata2_${i}`); let elS1Rap = document.getElementById(`s1_rap_${i}`);
+          let elRap1Tampil = document.getElementById(`rap1_tampil_${i}`); 
+          let elRata = document.getElementById(`rata2_${i}`); let elRap2 = document.getElementById(`rap2_${i}`);
+          
+          const toggleClass = (el, val) => {
+            if(!el) return;
+            el.value = val;
+            if (parseFloat(val) < 65) { el.classList.add("text-red-500", "font-bold"); el.classList.remove("text-slate-700"); }
+            else { el.classList.remove("text-red-500", "font-bold"); el.classList.add("text-slate-700"); }
+          };
+
+          toggleClass(elS1Rata, dn.s1_rata2);
+          toggleClass(elS1Rap, dn.rap1);
+          toggleClass(elRap1Tampil, dn.rap1);
+          toggleClass(elRata, dn.rata2);
+          toggleClass(elRap2, dn.rap2);
+        }
+      });
+    }
+
+    function pindahSemester(smt) {
+      let tabel = document.getElementById('tabel-nilai'); 
+      let btn1 = document.getElementById('btn-smt1'); 
+      let btn2 = document.getElementById('btn-smt2');
+      const activeClass = "bg-blue-700 text-white".split(" ");
+      const inactiveClass = "bg-slate-300 text-slate-600 hover:bg-slate-400".split(" ");
+
+      if (smt === '1') { 
+        tabel.className = 'tabel-smt1 w-full min-w-[800px] text-xs'; 
+        btn1.classList.remove(...inactiveClass); btn1.classList.add(...activeClass); 
+        btn2.classList.remove(...activeClass); btn2.classList.add(...inactiveClass); 
+      } 
+      else { 
+        tabel.className = 'tabel-smt2 w-full min-w-[800px] text-xs'; 
+        btn2.classList.remove(...inactiveClass); btn2.classList.add(...activeClass); 
+        btn1.classList.remove(...activeClass); btn1.classList.add(...inactiveClass); 
+      }
+    }
+
+    /* --- SISTEM EKSPOR --- */
+    function exportDataBaru(cakupan) {
+      const jenis = document.getElementById('jenis-export').value;
+      const kelasAktif = document.getElementById('kelas').value;
+      const wb = XLSX.utils.book_new();
+      
+      let targetKelas = cakupan === 'kelas' ? [kelasAktif] : Object.keys(dbSiswa);
+      targetKelas.forEach(kls => {
+        if (!kls || !dbSiswa[kls] || dbSiswa[kls].length === 0) return;
+        
+        let dataSheet = [];
+        dbSiswa[kls].forEach((s, i) => {
+          let dn = dataNilai[getKey(kls, s.nama)] || {};
+          let rowData = { "No": i + 1, "Kelas": kls, "Nama Siswa": s.nama };
+          
+          // SEMESTER 1 Export Rules
+          if (['smt1', 'full'].includes(jenis)) {
+            for(let j=1; j<=8; j++) rowData[`NH ${j} SMT1`] = dn[`s1_nh${j}`] || "";
+            rowData["STS 1"] = dn.s1_sts || "";
+            rowData["PAS"] = dn.s1_pas || "";
+            rowData["RAPOR 1"] = dn.rap1 || "";
+          } else if (jenis === 'sts1') {
+            rowData["STS 1"] = dn.s1_sts || "";
+          } else if (jenis === 'rapor1' || jenis === 'rapor_full') {
+            rowData["RAPOR 1"] = dn.rap1 || "";
+          }
+
+          // SEMESTER 2 Export Rules
+          if (['smt2', 'full'].includes(jenis)) {
+            rowData["RAPOR 1 (Auto)"] = dn.rap1 || "";
+            for(let j=1; j<=8; j++) rowData[`NH ${j} SMT2`] = dn[`nh${j}`] || "";
+            rowData["STS 2"] = dn.sts || "";
+            rowData["SAS"] = dn.sas || "";
+            rowData["RAPOR 2"] = dn.rap2 || "";
+          } else if (jenis === 'sts2') {
+            rowData["STS 2"] = dn.sts || "";
+          } else if (jenis === 'rapor2' || jenis === 'rapor_full') {
+            if(jenis === 'rapor2') rowData["RAPOR 1 (Auto)"] = dn.rap1 || ""; // Rujukan sateuacanna
+            rowData["RAPOR 2"] = dn.rap2 || "";
+          }
+
+          dataSheet.push(rowData);
+        });
+        if (dataSheet.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataSheet), kls); 
+      });
+      
+      if(wb.SheetNames.length > 0) {
+        XLSX.writeFile(wb, `Data_Nilai_${jenis.toUpperCase()}_${cakupan}.xlsx`);
+      } else {
+        alert("Pilih heula kelasna atawa euweuh data keur di-export!");
+      }
+    }
+    
+    function loadHistoryMapel() {
+      let historyMapel = JSON.parse(localStorage.getItem('almatuq_history_mapel')) || ["PAI", "PKN", "B. INDONESIA", "MATEMATIKA", "IPA", "IPS", "B. INGGRIS", "B. ARAB", "B. SUNDA", "PJOK", "INFORMATIKA"];
+      let datalist = document.getElementById('list-mapel'); datalist.innerHTML = ''; 
+      historyMapel.forEach(m => { let option = document.createElement('option'); option.value = m; datalist.appendChild(option); });
+    }
+
+    function simpanHistoryMapel(mapelBaru) {
+      mapelBaru = mapelBaru.trim().toUpperCase(); if (mapelBaru === "") return;
+      let historyMapel = JSON.parse(localStorage.getItem('almatuq_history_mapel')) || ["PAI", "PKN", "B. INDONESIA", "MATEMATIKA", "IPA", "IPS", "B. INGGRIS", "B. ARAB", "B. SUNDA", "PJOK", "INFORMATIKA"];
+      if (!historyMapel.includes(mapelBaru)) { historyMapel.push(mapelBaru); localStorage.setItem('almatuq_history_mapel', JSON.stringify(historyMapel)); loadHistoryMapel(); }
+    }
+
+    /* --- FITUR BARU: BACKUP & RESTORE JSON --- */
+    function backupData() {
+        const payload = {
+            siswa: dbSiswa,
+            nilai: dataNilai,
+            history: JSON.parse(localStorage.getItem('almatuq_history_mapel')) || []
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Backup_Data_Nilai_AlMatuq_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+
+    function restoreData(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if(parsed.siswa && parsed.nilai) {
+                    if(confirm("Yakin badé mulangkeun (restore) data ieu? Data nu ayeuna aya dina aplikasi bakal kaganti ku data tina file JSON ieu!")) {
+                        localStorage.setItem('almatuq_siswa', JSON.stringify(parsed.siswa));
+                        localStorage.setItem('almatuq_nilai', JSON.stringify(parsed.nilai));
+                        if(parsed.history) localStorage.setItem('almatuq_history_mapel', JSON.stringify(parsed.history));
+                        
+                        alert("✅ Data berhasil di-restore! Aplikasi bakal otomatis dimuat ulang.");
+                        location.reload();
+                    }
+                } else {
+                    alert("❌ Format file JSON lepat! Sanés file backup ti aplikasi ieu.");
+                }
+            } catch(err) {
+                alert("❌ Error maca file JSON. Pastikeun filena teu ruksak.");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ""; // Reset input
+    }
+
+    function resetSemuaData() {
+      if(confirm("Yakin hapus sadayana? Data siswa jeung nilai bakal leungit tina HP/Laptop ieu sagemblengna! Pastikeun tos di-Backup heula!")) { 
+          localStorage.clear(); 
+          location.reload(); 
+      }
+    }
+  </script>
+
+</body>
+</html>
