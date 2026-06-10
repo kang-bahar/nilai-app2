@@ -1,0 +1,62 @@
+{
+  "name": "Aplikasi Daftar Nilai Pesantren Al Ma'tuq",
+  "short_name": "Nilai Al Ma'tuq",
+  "description": "Aplikasi input dan manajemen nilai siswa dengan support offline",
+  "start_url": "./nilai-pwa.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0f172a",
+  "background_color": "#f8fafc",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>📚</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f172a' width='512' height='512'/><text x='50%' y='50%' font-size='250' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>📚</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23f8fafc' width='540' height='720'/><rect fill='%230f172a' width='540' height='60'/><text x='270' y='35' font-size='24' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>Daftar Nilai</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Input Nilai",
+      "short_name": "Input",
+      "description": "Buka halaman input nilai siswa",
+      "url": "./nilai-pwa.html?page=utama",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>✍️</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Export Data",
+      "short_name": "Export",
+      "description": "Export nilai ke Excel",
+      "url": "./nilai-pwa.html?page=export",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>📤</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
