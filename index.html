@@ -24,7 +24,7 @@
     input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
 
-    .table-scroll { max-height: 65vh; overflow-y: auto; overflow-x: auto; position: relative;}
+    .table-scroll { max-height: 72vh; overflow-y: auto; overflow-x: auto; position: relative;}
     .tabel-smt1 .col-smt2 { display: none; }
     .tabel-smt2 .col-smt1 { display: none; }
 
@@ -41,58 +41,58 @@
   <input type="file" id="fileRestore" class="hidden" onchange="restoreData(event)" accept=".json">
 
   <!-- Header & Navigasi -->
-  <div class="bg-gradient-to-r from-emerald-900 to-emerald-600 text-white p-6 shadow-md relative border-b-4 border-amber-400">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+  <div class="bg-gradient-to-r from-emerald-900 to-emerald-600 text-white px-4 py-3 shadow-md relative border-b-4 border-amber-400">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
       <div class="text-center md:text-left">
-        <h2 class="text-2xl font-extrabold tracking-wide">DAFTAR NILAI</h2>
-        <h3 class="text-sm font-medium text-amber-200 tracking-wider">PESANTREN AL MA'TUQ</h3>
+        <h2 class="text-lg font-extrabold tracking-wide leading-tight">DAFTAR NILAI</h2>
+        <h3 class="text-xs font-medium text-amber-200 tracking-wider">PESANTREN AL MA'TUQ</h3>
       </div>
       
-      <div class="flex gap-2 flex-wrap justify-center">
-        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white text-emerald-900 shadow" id="nav-utama" onclick="bukaHalaman('utama')">🏠 Utama</button>
-        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-siswa" onclick="bukaHalaman('siswa')">👥 Data Siswa</button>
-        <button class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-pengaturan" onclick="bukaHalaman('pengaturan')">⚙️ Pengaturan</button>
+      <div class="flex gap-1.5 flex-wrap justify-center">
+        <button class="px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 bg-white text-emerald-900 shadow" id="nav-utama" onclick="bukaHalaman('utama')">🏠 Utama</button>
+        <button class="px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-siswa" onclick="bukaHalaman('siswa')">👥 Data Siswa</button>
+        <button class="px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 bg-white/20 text-white hover:bg-white/40 border border-white/30 backdrop-blur-sm" id="nav-pengaturan" onclick="bukaHalaman('pengaturan')">⚙️ Pengaturan</button>
       </div>
     </div>
   </div>
 
-  <main class="max-w-full mx-auto px-2 md:px-6 py-4">
+  <main class="max-w-full mx-auto px-2 md:px-4 py-3">
     <!-- HALAMAN UTAMA -->
-    <div id="page-input" class="block space-y-4">
+    <div id="page-input" class="block space-y-3">
       
-      <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-emerald-500">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-lg p-3 shadow-sm border-l-4 border-emerald-500">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Guru</label>
-            <input type="text" id="guru" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition" placeholder="Nama Guru" oninput="saveSesi()">
+            <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Guru</label>
+            <input type="text" id="guru" class="w-full p-2 border border-slate-300 rounded-md text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition" placeholder="Nama Guru" oninput="saveSesi()">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Mata Pelajaran</label>
-            <input type="text" id="mapel" list="list-mapel" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition uppercase" placeholder="Ketik/Pilih" onchange="gantiMapel(); simpanHistoryMapel(this.value);" oninput="saveSesi()">
+            <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Mata Pelajaran</label>
+            <input type="text" id="mapel" list="list-mapel" class="w-full p-2 border border-slate-300 rounded-md text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition uppercase" placeholder="Ketik/Pilih" onchange="gantiMapel(); simpanHistoryMapel(this.value);" oninput="saveSesi()">
             <datalist id="list-mapel"></datalist>
           </div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Kelas</label>
-            <select id="kelas" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer" onchange="loadSiswa()"></select>
+            <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Kelas</label>
+            <select id="kelas" class="w-full p-2 border border-slate-300 rounded-md text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer" onchange="loadSiswa()"></select>
           </div>
-          <div id="container-siswa" class="hidden bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-            <label class="block text-xs font-bold text-emerald-800 mb-1 uppercase tracking-wide">🔍 Fokus Siswa</label>
-            <select id="siswa" class="w-full p-2 border border-emerald-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer" onchange="filterSiswa()"></select>
+          <div id="container-siswa" class="hidden bg-emerald-50 p-2 rounded-md border border-emerald-200">
+            <label class="block text-[11px] font-bold text-emerald-800 mb-1 uppercase tracking-wide">🔍 Fokus Siswa</label>
+            <select id="siswa" class="w-full p-1.5 border border-emerald-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer" onchange="filterSiswa()"></select>
           </div>
         </div>
       </div>
 
       <!-- Tabel Controls -->
-      <div id="tab-container" class="hidden flex-col md:flex-row justify-between items-end gap-3 pt-2 border-b-2 border-slate-300 pb-2 px-1">
+      <div id="tab-container" class="hidden flex-col md:flex-row justify-between items-end gap-2 pt-1 border-b-2 border-slate-300 pb-1 px-1">
         <div class="flex gap-1 w-full md:w-auto">
-          <button id="btn-smt1" class="flex-1 md:flex-none px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-t-lg transition" onclick="pindahSemester('1')">SMT 1</button>
-          <button id="btn-smt2" class="flex-1 md:flex-none px-5 py-2.5 bg-slate-300 text-slate-600 font-bold rounded-t-lg transition hover:bg-slate-400" onclick="pindahSemester('2')">SMT 2</button>
+          <button id="btn-smt1" class="flex-1 md:flex-none px-4 py-1.5 text-sm bg-emerald-600 text-white font-bold rounded-t-md transition" onclick="pindahSemester('1')">SMT 1</button>
+          <button id="btn-smt2" class="flex-1 md:flex-none px-4 py-1.5 text-sm bg-slate-300 text-slate-600 font-bold rounded-t-md transition hover:bg-slate-400" onclick="pindahSemester('2')">SMT 2</button>
         </div>
-        <div class="flex flex-wrap gap-2 items-center w-full md:w-auto justify-end">
-          <select id="jenis-export" class="p-2 rounded-md border border-slate-400 text-xs font-bold text-slate-700 outline-none cursor-pointer bg-white">
+        <div class="flex flex-wrap gap-1.5 items-center w-full md:w-auto justify-end">
+          <select id="jenis-export" class="p-1.5 rounded-md border border-slate-400 text-xs font-bold text-slate-700 outline-none cursor-pointer bg-white">
             <option value="smt1">FULL SMT 1</option>
             <option value="sts1">HANYA STS 1</option>
             <option value="rapor1">HANYA RAPOR SMT 1</option>
@@ -102,54 +102,54 @@
             <option value="full">FULL 2 SMT</option>
             <option value="rapor_full">RAPOR SMT 1 & 2</option>
           </select>
-          <button onclick="unduhTemplate()" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-xs font-bold transition shadow-sm">📋 Unduh Template</button>
-          <button onclick="document.getElementById('fileUpload').click()" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-bold transition shadow-sm">📥 Impor</button>
-          <button onclick="exportDataBaru('kelas')" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Kelas</button>
-          <button onclick="exportDataBaru('semua')" class="px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Semua</button>
+          <button onclick="unduhTemplate()" class="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-xs font-bold transition shadow-sm">📋 Template</button>
+          <button onclick="document.getElementById('fileUpload').click()" class="px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-bold transition shadow-sm">📥 Impor</button>
+          <button onclick="exportDataBaru('kelas')" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Kelas</button>
+          <button onclick="exportDataBaru('semua')" class="px-2.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-md text-xs font-bold transition shadow-sm">📤 Exp. Semua</button>
         </div>
       </div>
 
       <!-- Container Tabel -->
-      <div id="table-container" class="hidden bg-white rounded-xl shadow-lg border border-slate-200 table-scroll">
-        <table id="tabel-nilai" class="tabel-smt1 w-full min-w-[800px] text-xs">
+      <div id="table-container" class="hidden bg-white rounded-lg shadow-lg border border-slate-200 table-scroll">
+        <table id="tabel-nilai" class="tabel-smt1 w-full min-w-[800px] text-[11px]">
           <thead>
             <!-- Baris Header 1 -->
-            <tr class="h-[40px] bg-emerald-700 text-white uppercase tracking-wider text-center">
-              <th rowspan="2" class="sticky top-0 left-0 z-[40] bg-emerald-700 w-[40px] p-2 border-r border-emerald-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-emerald-900">No</th>
-              <th rowspan="2" class="sticky top-0 left-[40px] z-[40] bg-emerald-700 text-left p-2 min-w-[200px] w-[200px] border-r border-emerald-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-emerald-900">Nama Lengkap</th>
-              <th colspan="12" class="col-smt1 sticky top-0 z-[30] bg-emerald-700 p-2 border-b border-emerald-600">NILAI SEMESTER 1</th>
-              <th colspan="13" class="col-smt2 sticky top-0 z-[30] bg-emerald-700 p-2 border-b border-emerald-600">NILAI SEMESTER 2</th>
+            <tr class="h-[30px] bg-emerald-700 text-white uppercase tracking-wider text-center">
+              <th rowspan="2" class="sticky top-0 left-0 z-[40] bg-emerald-700 w-[32px] p-1 border-r border-emerald-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-emerald-900">No</th>
+              <th rowspan="2" class="sticky top-0 left-[32px] z-[40] bg-emerald-700 text-left p-1.5 min-w-[170px] w-[170px] border-r border-emerald-600 shadow-[2px_0_4px_rgba(0,0,0,0.1)] border-b-2 border-b-emerald-900">Nama Lengkap</th>
+              <th colspan="12" class="col-smt1 sticky top-0 z-[30] bg-emerald-700 p-1 border-b border-emerald-600">NILAI SEMESTER 1</th>
+              <th colspan="13" class="col-smt2 sticky top-0 z-[30] bg-emerald-700 p-1 border-b border-emerald-600">NILAI SEMESTER 2</th>
             </tr>
             <!-- Baris Header 2 -->
-            <tr class="h-[40px] bg-emerald-600 text-white text-center border-b-2 border-emerald-900">
+            <tr class="h-[30px] bg-emerald-600 text-white text-center border-b-2 border-emerald-900">
               <!-- SMT 1 Headers -->
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH1</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH2</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH3</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH4</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH5</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH6</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH7</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH8</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-800 p-2 w-16">STS 1</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-16">RATA2</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-emerald-800 p-2 w-16">PAS</th>
-              <th class="col-smt1 sticky top-[40px] z-[30] bg-amber-600 p-2 w-16">RAPOR 1</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH1</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH2</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH3</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH4</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH5</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH6</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH7</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH8</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-800 p-1 w-14">STS 1</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-14">RATA2</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-emerald-800 p-1 w-14">PAS</th>
+              <th class="col-smt1 sticky top-[30px] z-[30] bg-amber-600 p-1 w-14">RAPOR 1</th>
               
               <!-- SMT 2 Headers -->
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-800 text-emerald-100 p-2 w-16 leading-tight">RAPOR 1<br>(Auto)</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH1</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH2</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH3</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH4</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH5</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH6</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH7</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-14">NH8</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-800 p-2 w-16">STS 2</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-600 p-2 w-16">RATA2</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-emerald-800 p-2 w-16">SAS</th>
-              <th class="col-smt2 sticky top-[40px] z-[30] bg-amber-600 p-2 w-16">RAPOR 2</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-800 text-emerald-100 p-1 w-14 leading-tight">RAPOR 1<br>(Auto)</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH1</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH2</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH3</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH4</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH5</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH6</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH7</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-12">NH8</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-800 p-1 w-14">STS 2</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-600 p-1 w-14">RATA2</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-emerald-800 p-1 w-14">SAS</th>
+              <th class="col-smt2 sticky top-[30px] z-[30] bg-amber-600 p-1 w-14">RAPOR 2</th>
             </tr>
           </thead>
           <tbody id="table-body" class="bg-white">
@@ -161,26 +161,26 @@
 
     <!-- HALAMAN MANAJEMEN SISWA -->
     <div id="page-siswa" class="hidden">
-      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-amber-500">
-        <h3 class="text-lg font-bold text-amber-700 mb-2">👥 Pengaturan Data Siswa</h3>
-        <p class="text-sm text-slate-500 mb-6">Di dieu tiasa ngarobah ngaran, mindahkeun budak ka kelas séjén, ngahapus, sarta ngatur urutan absen (naik/turun).</p>
+      <div class="bg-white rounded-lg p-4 shadow-sm border-l-4 border-amber-500">
+        <h3 class="text-base font-bold text-amber-700 mb-1">👥 Pengaturan Data Siswa</h3>
+        <p class="text-xs text-slate-500 mb-3">Di dieu tiasa ngarobah ngaran, mindahkeun budak ka kelas séjén, ngahapus, sarta ngatur urutan absen (naik/turun).</p>
         
-        <div class="mb-4 max-w-sm">
-          <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wide">Pilih Kelas:</label>
-          <select id="kelas-manajemen" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50" onchange="renderTabelSiswa()"></select>
+        <div class="mb-3 max-w-sm">
+          <label class="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Pilih Kelas:</label>
+          <select id="kelas-manajemen" class="w-full p-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50" onchange="renderTabelSiswa()"></select>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-slate-200">
+        <div class="overflow-x-auto rounded-md border border-slate-200">
           <table class="w-full text-sm text-left">
-            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
+            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[11px]">
               <tr>
-                <th class="p-3 w-12 text-center">No</th>
-                <th class="p-3">Nama Siswa (Ketik u/ Edit)</th>
-                <th class="p-3 w-64 text-center">Aksi / Urutan</th>
+                <th class="p-2 w-12 text-center">No</th>
+                <th class="p-2">Nama Siswa (Ketik u/ Edit)</th>
+                <th class="p-2 w-64 text-center">Aksi / Urutan</th>
               </tr>
             </thead>
             <tbody id="tbody-manajemen" class="divide-y divide-slate-200">
-              <tr><td colspan="3" class="p-5 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>
+              <tr><td colspan="3" class="p-4 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>
             </tbody>
           </table>
         </div>
@@ -188,32 +188,32 @@
     </div>
 
     <!-- HALAMAN PENGATURAN -->
-    <div id="page-data" class="hidden space-y-4">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div id="page-data" class="hidden space-y-3">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <!-- Card Import -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-emerald-500">
-          <h3 class="text-lg font-bold text-emerald-700 mb-2">📂 Import Data Excel (Multi-Sheet)</h3>
-          <p class="text-sm text-slate-500 mb-4">Pilih file Excel. Sistem otomatis ngabaca sadaya *sheet* sareng nga-import sakaligus jadi sababaraha kelas.</p>
-          <button class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition" onclick="document.getElementById('fileUpload').click()">Mulai Import Excel</button>
+        <div class="bg-white rounded-lg p-4 shadow-sm border-l-4 border-emerald-500">
+          <h3 class="text-base font-bold text-emerald-700 mb-1">📂 Import Data Excel (Multi-Sheet)</h3>
+          <p class="text-xs text-slate-500 mb-3">Pilih file Excel. Sistem otomatis ngabaca sadaya *sheet* sareng nga-import sakaligus jadi sababaraha kelas.</p>
+          <button class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-md transition" onclick="document.getElementById('fileUpload').click()">Mulai Import Excel</button>
         </div>
 
         <!-- Card Backup & Restore -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-emerald-500">
-          <h3 class="text-lg font-bold text-amber-700 mb-2">🔄 Backup & Restore Data</h3>
-          <p class="text-sm text-slate-500 mb-4">Amankeun data lokal ka jero file JSON, atawa balikeun data tina file backup JSON sateuacanna.</p>
+        <div class="bg-white rounded-lg p-4 shadow-sm border-l-4 border-emerald-500">
+          <h3 class="text-base font-bold text-amber-700 mb-1">🔄 Backup & Restore Data</h3>
+          <p class="text-xs text-slate-500 mb-3">Amankeun data lokal ka jero file JSON, atawa balikeun data tina file backup JSON sateuacanna.</p>
           <div class="flex gap-2">
-            <button class="flex-1 py-3 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-lg transition border border-amber-300" onclick="backupData()">☁️ Backup (Download)</button>
-            <button class="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg transition" onclick="document.getElementById('fileRestore').click()">🔁 Restore (Upload)</button>
+            <button class="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-bold rounded-md transition border border-amber-300" onclick="backupData()">☁️ Backup (Download)</button>
+            <button class="flex-1 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-md transition" onclick="document.getElementById('fileRestore').click()">🔁 Restore (Upload)</button>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <!-- Card Reset -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-red-500">
-          <h3 class="text-lg font-bold text-red-600 mb-2">⚠️ Reset Memori HP Ini</h3>
-          <p class="text-sm text-slate-500 mb-4">Pencét ieu pami badé ngosongkeun sadaya aplikasi jiga anyar deui (Nomer Kelas & Nilai bakal leungit tina panyimpenan browser).</p>
-          <button class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition" onclick="resetSemuaData()">Hapus Semua Cache Browser</button>
+        <div class="bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500">
+          <h3 class="text-base font-bold text-red-600 mb-1">⚠️ Reset Memori HP Ini</h3>
+          <p class="text-xs text-slate-500 mb-3">Pencét ieu pami badé ngosongkeun sadaya aplikasi jiga anyar deui (Nomer Kelas & Nilai bakal leungit tina panyimpenan browser).</p>
+          <button class="w-full py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-md transition" onclick="resetSemuaData()">Hapus Semua Cache Browser</button>
         </div>
       </div>
     </div>
@@ -307,20 +307,20 @@
     function renderTabelSiswa() {
       const kls = document.getElementById('kelas-manajemen').value;
       const tbody = document.getElementById('tbody-manajemen');
-      if(!kls || !dbSiswa[kls]) { tbody.innerHTML = '<tr><td colspan="3" class="p-5 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>'; return; }
+      if(!kls || !dbSiswa[kls]) { tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400 italic">Pilih kelas heula di luhur</td></tr>'; return; }
 
       let html = '';
       dbSiswa[kls].forEach((s, i) => {
         html += `
         <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 text-center font-bold text-slate-400">${i+1}</td>
-            <td class="p-2">
-              <input type="text" class="w-full p-2 border-b border-slate-300 bg-transparent font-semibold text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-emerald-50 transition" value="${s.nama}" onchange="updateNamaMaster('${kls}', ${i}, this.value, '${s.nama}')">
+            <td class="p-2 text-center font-bold text-slate-400 text-sm">${i+1}</td>
+            <td class="p-1.5">
+              <input type="text" class="w-full p-1.5 border-b border-slate-300 bg-transparent font-semibold text-slate-700 text-sm focus:outline-none focus:border-emerald-500 focus:bg-emerald-50 transition" value="${s.nama}" onchange="updateNamaMaster('${kls}', ${i}, this.value, '${s.nama}')">
             </td>
-            <td class="p-2 text-center space-x-1">
+            <td class="p-1.5 text-center space-x-1">
                 <button class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-bold transition shadow-sm" title="Naik" onclick="geserSiswa('${kls}', ${i}, -1)">⬆️</button>
                 <button class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-bold transition shadow-sm" title="Turun" onclick="geserSiswa('${kls}', ${i}, 1)">⬇️</button>
-                <button class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold transition shadow-sm" title="Pindah Kelas" onclick="pindahKelas('${kls}', ${i})">➡️ Pindah</button>
+                <button class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold transition shadow-sm" title="Pindah Kelas" onclick="pindahKelas('${kls}', ${i})">➡️ Pindah</button>
                 <button class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-bold transition shadow-sm" title="Hapus" onclick="hapusSiswa('${kls}', ${i})">🗑️</button>
             </td>
         </tr>`;
@@ -573,8 +573,8 @@
       const kelas = document.getElementById('kelas').value;
       let html = '';
 
-      const inputClass = "w-full text-center bg-transparent py-2 px-1 focus:bg-emerald-50 focus:outline-none transition-colors border-none";
-      const readonlyClass = "w-full text-center bg-transparent py-2 px-1 font-bold border-none outline-none";
+      const inputClass = "w-full text-center bg-transparent py-1 px-1 focus:bg-emerald-50 focus:outline-none transition-colors border-none";
+      const readonlyClass = "w-full text-center bg-transparent py-1 px-1 font-bold border-none outline-none";
 
       siswaSaatIni.forEach((s, i) => {
         if(filterIndex !== 'all' && parseInt(filterIndex) !== i) return;
@@ -583,8 +583,8 @@
         const dn = dataNilai[keyUnik];
         
         html += `<tr class="hover:bg-emerald-50 transition group">
-          <td class="sticky left-0 z-[10] bg-white group-hover:bg-emerald-50 transition text-center font-bold text-slate-400 p-1 w-[40px] border-r border-slate-200 shadow-[1px_0_2px_rgba(0,0,0,0.02)]">${i+1}</td>
-          <td class="col-nama sticky left-[40px] z-[10] bg-white group-hover:bg-emerald-50 transition font-semibold text-slate-700 p-2 border-r border-slate-200 shadow-[2px_0_4px_rgba(0,0,0,0.05)] text-xs whitespace-nowrap">${s.nama}</td>
+          <td class="sticky left-0 z-[10] bg-white group-hover:bg-emerald-50 transition text-center font-bold text-slate-400 p-1 w-[32px] border-r border-slate-200 shadow-[1px_0_2px_rgba(0,0,0,0.02)]">${i+1}</td>
+          <td class="col-nama sticky left-[32px] z-[10] bg-white group-hover:bg-emerald-50 transition font-semibold text-slate-700 p-1.5 border-r border-slate-200 shadow-[2px_0_4px_rgba(0,0,0,0.05)] text-[11px] whitespace-nowrap">${s.nama}</td>
           
           <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh1)}" value="${dn.s1_nh1}" oninput="simpanData('${keyUnik}', 's1_nh1', this.value, this)"></td>
           <td class="col-smt1 p-0"><input type="number" class="${inputClass} ${getWarnaBeureum(dn.s1_nh2)}" value="${dn.s1_nh2}" oninput="simpanData('${keyUnik}', 's1_nh2', this.value, this)"></td>
@@ -689,12 +689,12 @@
       const inactiveClass = "bg-slate-300 text-slate-600 hover:bg-slate-400".split(" ");
 
       if (smt === '1') { 
-        tabel.className = 'tabel-smt1 w-full min-w-[800px] text-xs'; 
+        tabel.className = 'tabel-smt1 w-full min-w-[800px] text-[11px]'; 
         btn1.classList.remove(...inactiveClass); btn1.classList.add(...activeClass); 
         btn2.classList.remove(...activeClass); btn2.classList.add(...inactiveClass); 
       } 
       else { 
-        tabel.className = 'tabel-smt2 w-full min-w-[800px] text-xs'; 
+        tabel.className = 'tabel-smt2 w-full min-w-[800px] text-[11px]'; 
         btn2.classList.remove(...inactiveClass); btn2.classList.add(...activeClass); 
         btn1.classList.remove(...activeClass); btn1.classList.add(...inactiveClass); 
       }
