@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nilai-app-v2.0';
+const CACHE_NAME = 'nilai-app-v3.0';
 const ASSETS_TO_CACHE = [
   './',
   './nilai-pwa.html',
